@@ -1,0 +1,4 @@
+---
+kubvirt_base_url: "https://github.com/kubevirt/kubevirt/releases/download/v{{ kubevirt_version }}"
+kubevirt_url_operator_url: "{{ kubvirt_base_url }}/kubevirt-operator.yaml"
+kubevirt_url_resource_url: "{{ kubvirt_base_url }}/kubevirt-cr.yaml"

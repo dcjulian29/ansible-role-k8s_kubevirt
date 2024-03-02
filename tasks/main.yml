@@ -1,0 +1,49 @@
+---
+- name: Download KubeVirt operator manifest
+  ansible.builtin.get_url:
+    url: "{{ kubevirt_url_operator_url }}"
+    dest: /tmp/kubevirt-operator.yaml
+    mode: '0664'
+
+- name: Apply KubeVirt operator manifest to the cluster
+  kubernetes.core.k8s:
+    context: "{{ k8s_context | default(omit) }}"
+    kubeconfig: "{{ k8s_config | default(omit) }}"
+    namespace: "{{ kubevirt_namespace }}"
+    state: present
+    src: /tmp/kubevirt-operator.yaml
+
+- name: Download KubeVirt resources manifest
+  ansible.builtin.get_url:
+    url: "{{ kubevirt_url_resource_url }}"
+    dest: /tmp/kubevirt-cr.yaml
+    mode: '0664'
+
+- name: Apply KubeVirt resource manifest to the cluster
+  kubernetes.core.k8s:
+    context: "{{ k8s_context | default(omit) }}"
+    kubeconfig: "{{ k8s_config | default(omit) }}"
+    namespace: "{{ kubevirt_namespace }}"
+    state: present
+    src: /tmp/kubevirt-cr.yaml
+    wait: true
+    wait_condition:
+      status: true
+      reason: Available
+
+- name: Enable KubeVirt LiveMagration feature
+  kubernetes.core.k8s:
+    context: "{{ k8s_context | default(omit) }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: kubevirt-config
+        labels:
+          kubevirt.io: ""
+      data:
+        feature-gates: LiveMigration
+    kubeconfig: "{{ k8s_config | default(omit) }}"
+    namespace: "{{ kubevirt_namespace }}"
+    state: present
+  when: kubevirt_livemigrate

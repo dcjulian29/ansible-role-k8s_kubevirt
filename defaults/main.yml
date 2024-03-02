@@ -1,0 +1,6 @@
+---
+kubevirt_livemigrate: false
+kubevirt_namespace: kubevirt
+kubevirt_version: 1.1.1
+k8s_config: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_KUBECONFIG', default=undef()) }}"
+k8s_context: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_CONTEXT', default=undef()) }}"
